@@ -1,12 +1,21 @@
 /** 底层支撑逻辑 */
 
+var documentWidth = window.screen.availWidth;
+var documentHeight = window.screen.availHeight;
+
+var gridContainerWidth = 0.92 * documentWidth;
+var cellSideLength = 0.18 * documentWidth;
+var cellSpace = 0.04 * documentWidth;
+
+
+
 // Params: 坐标i和j
 function getPosTop( i , j ){
-    return 20 + i*120;
+    return cellSpace + i * (cellSideLength + cellSpace);
 }
 
 function getPosLeft( i , j ){
-    return 20 + j*120;
+    return cellSpace + j * (cellSideLength + cellSpace);
 }
 
 function getNumberBackgroundColor( number ){

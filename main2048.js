@@ -4,10 +4,35 @@ var board = new Array();
 var score = 0;
 var hasConflicted = new Array();
 
+// 触控
+var startx = 0;
+var starty = 0;
+var endx = 0;
+var endy = 0;
+
 // 主函数
 $(document).ready(function(){
+    prepareForMobile();
     newgame();
 });
+
+function prepareForMobile() {
+
+    if(documentWidth > 500) {
+        gridContainerWidth = 500;
+        cellSpace = 20;
+        cellSideLength = 100;
+    }
+
+    $("#grid-container").css("width", gridContainerWidth - 2 * cellSpace);
+    $("#grid-container").css("height", gridContainerWidth - 2 * cellSpace);
+    $("#grid-container").css("padding", cellSpace);
+    $("#grid-container").css("border-radius", 0.02 * gridContainerWidth);
+
+    $(".grid-cell").css("width", cellSideLength);
+    $(".grid-cell").css("height", cellSideLength);
+    $(".grid-cell").css("border-radius", 0.02 * cellSideLength);
+}
 
 // 开始一个新游戏
 // 1. UI初始化
@@ -43,6 +68,7 @@ function init(){
 
     // 初始化Score
     score = 0;
+    updateScore(score);
 }
 
 // 根据Board值，对number-cell进行操作，更新UI
@@ -58,11 +84,11 @@ function updateBoardView() {
                 theNumberCell.css('width', '0px');
                 theNumberCell.css('height', '0px');
                 // 置于grid-cell中间
-                theNumberCell.css('top', getPosTop(i, j) + 50 + 'px');
-                theNumberCell.css('left', getPosLeft(i, j) + 50 + 'px');
+                theNumberCell.css('top', getPosTop(i, j) + cellSideLength / 2 + 'px');
+                theNumberCell.css('left', getPosLeft(i, j) + cellSideLength / 2 + 'px');
             } else {
-                theNumberCell.css('width', '100px');
-                theNumberCell.css('height', '100px');
+                theNumberCell.css('width', cellSideLength);
+                theNumberCell.css('height', cellSideLength);
                 theNumberCell.css('top', getPosTop(i, j) + 'px');
                 theNumberCell.css('left', getPosLeft(i, j) + 'px');
                 // 不同数对应不同的背景色
@@ -74,6 +100,8 @@ function updateBoardView() {
             hasConflicted[i][j] = false;
         }
     }
+    $(".number-cell").css("line-height", cellSideLength + "px");
+    $(".number-cell").css("font-size", 0.6 * cellSideLength + "px");
 }
 
 
@@ -118,37 +146,105 @@ function generateOneNumber(){
 }
 
 
-
-/** 基于玩家响应的游戏循环 */
+/** PC端 按键响应 */
 
 $(document).keydown(function(event) {
+    
     switch(event.keyCode) {
         case 37:    // left
             if(moveLeft()) {
+                // 防止滚动条滚动
+                event.preventDefault();
                 setTimeout("generateOneNumber()",210);
                 setTimeout("isgameover()", 300);
             }
             break;
         case 38:    // up
             if(moveUp()) {
+                // 防止滚动条滚动
+                event.preventDefault();
                 setTimeout("generateOneNumber()",210);
                 setTimeout("isgameover()", 300);
             }
             break;
         case 39:    // right
             if(moveRight()) {
+                // 防止滚动条滚动
+                event.preventDefault();
                 setTimeout("generateOneNumber()",210);
                 setTimeout("isgameover()", 300);
             }
             break;
         case 40:    // down
             if(moveDown()) {
+                // 防止滚动条滚动
+                event.preventDefault();
                 setTimeout("generateOneNumber()",210);
                 setTimeout("isgameover()", 300);
             }
             break;
         default:
             break;
+    }
+});
+
+
+/** 移动端 触控事件 */
+document.addEventListener("touchstart", function(event) {
+    // event.touches是一个数组，存储多点触控信息
+    startx = event.touches[0].pageX;
+    starty = event.touches[0].pageY;
+});
+
+document.addEventListener("touchmove", function(event) {
+    event.preventDefault();
+});
+
+document.addEventListener("touchend", function(event) {
+    endx = event.changedTouches[0].pageX;
+    endy = event.changedTouches[0].pageY;
+
+    var deltax = endx - startx;
+    var deltay = endy - starty;
+
+    // 小幅度滑动不触发事件
+    if(Math.abs(deltax) < 0.3 * documentWidth && Math.abs(deltay) < 0.3 * documentWidth) {
+        return;
+    }
+
+    // x轴
+    if(Math.abs(deltax) >= Math.abs(deltay)) {
+        // 右移
+        if(deltax > 0) {
+            if(moveRight()) {
+                setTimeout("generateOneNumber()",210);
+                setTimeout("isgameover()", 300);
+            }
+        }
+        // 左移
+        else {
+            if(moveLeft()) {
+                setTimeout("generateOneNumber()",210);
+                setTimeout("isgameover()", 300);
+            }
+        }
+    }
+    // y轴
+    else {
+        // 下移
+        if(deltay > 0) {
+            if(moveDown()) {
+                setTimeout("generateOneNumber()",210);
+                setTimeout("isgameover()", 300);
+            }
+        }
+        // 上移
+        else {
+            if(moveUp()) {
+                setTimeout("generateOneNumber()",210);
+                setTimeout("isgameover()", 300);
+            }
+        }
     }
 });
 
@@ -322,11 +418,25 @@ function moveDown() {
 function isgameover(){
     // 结束条件：没有多余空间 且 无法移动
     if(nospace(board) && nomove(board)) {
-        gameover();
+        gameOver();
     }
+
+    for(var i = 0; i < 4; i++){
+		for(var j = 0; j < 4; j++){
+			if( board[i][j] == 2048 ){
+				youWin();
+			}
+		}
+	}
 }
 
-function gameover() {
-    alert("游戏结束！");
+function gameOver(){
+	$('.mask').show();
+	$('.fail').show();
+}
+
+function youWin(){
+	$('.mask').show();
+	$('.success').show();
 }
 

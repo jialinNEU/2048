@@ -2,14 +2,15 @@
 
 header {
     display: block;
-    width: 500px;
+    /*width: 500px;*/
+    width: 100%;
     margin: 0 auto;
     text-align: center;
 }
 
 header h1 {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 60px;
+    font-size: 40px;
     font-weight: bold;
 }
 
@@ -67,4 +68,41 @@ header p {
 
     line-height: 100px;
     text-align: center;
+}
+
+
+/** Win or Lose */
+
+.mask{
+	height: 500px;
+	width: 500px;
+	top: 285px;
+	margin: 0 auto;
+	background-color: black;
+	opacity: 0.5;
+	filter:alpha(opacity=50);
+	display: none;
+	position: absolute;
+	z-index: 100;
+	border-radius: 10px;
+}
+
+.success{
+	position: absolute;
+	top: 255px;
+	left: 519px;
+	z-index: 101;
+	display: none;
+	font: bold 40px '微软雅黑';
+	color:#FF9999;
+}
+
+.fail{
+	position: absolute;
+	top: 255px;
+	left: 519px;
+	z-index: 101;
+	display: none;
+	font: bold 40px '微软雅黑';
+	color:pink;
 }
